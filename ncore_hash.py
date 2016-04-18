@@ -19,14 +19,14 @@ SYMBOLS = [' ', '!', '"', '#', '$', '%', '&', "'", '(', ')', '*', '+',
 			',', '-', '.', '/','[', '\\', ']', '^', '_', '`',':', ';', '<', 
 			'=', '>', '?', '@']
 
-HASHTYPES = ['MD5']
+HASHTYPES = ['MD5','SHA1','SHA224','SHA256','SHA384','SHA512']
 
 def Arguments():
 	parser = argparse.ArgumentParser(description='Rainbow table creation utility')
 
 	parser.add_argument('-d', "--directory",  help="Storage Directory", type= ValidateDirectory, required=True)
 	parser.add_argument('-l', "--length",  help="Length range e.g. 2-8", type= RangeGeneration, required=True)
-	parser.add_argument('--hash', help="Hash function to use {}".format(str(HASHTYPES)), required=False)
+	parser.add_argument('--hash', help="Hash function to use {}".format(str(HASHTYPES)), type= GetHashFunction, required=False)
 
 	parser.add_argument("--lowercase", help="Use lowercase character set", action="store_true", default=False)
 	parser.add_argument("--uppercase", help="Use uppercase character set", action="store_true", default=False)
@@ -75,6 +75,24 @@ def RangeGeneration(ran):
 
 ##------------------------------------------------------------------------------------------
 
+def GetHashFunction(hashfunc):
+	if hashfunc not in HASHTYPES:
+		raise argparse.ArgumentTypeError('[!] Hash function was not found or was not in the correct format')	
+	if hashfunc == HASHTYPES[0]: ## MD5
+		return hashlib.md5()
+	elif hashfunc == HASHTYPES[1]: ## SHA1
+		return hashlib.sha1()
+	elif hashfunc == HASHTYPES[2]: ## SHA224
+		return hashlib.sha224()
+	elif hashfunc == HASHTYPES[3]: ## SHA256
+		return hashlib.sha256()
+	elif hashfunc == HASHTYPES[4]: ## SHA384
+		return hashlib.sha384()
+	elif hashfunc == HASHTYPES[5]: ## SHA512
+		return hashlib.sha512()
+
+##------------------------------------------------------------------------------------------
+
 def PasswordGen(size):
 	cnt = 0
 
@@ -98,10 +116,11 @@ def PasswordGen(size):
 				for s in itertools.product(list_to_use, repeat=i):
 					pword=''.join(s)
 
-					gen_hash = hashlib.md5()
+					gen_hash = hash_type
 
 					if salt_value != None:
-						gen_hash.update(salt_value+pword)
+						pword = salt_value + pword
+						gen_hash.update(pword)
 					else:
 						gen_hash.update(pword)
 
@@ -128,7 +147,7 @@ def CreatePool(ran):
 	results = cpu_pool.map(PasswordGen,(ran))
 	return results
 
-
+##------------------------------------------------------------------------------------------
 
 if __name__ == "__main__":
 	args = Arguments()
@@ -140,6 +159,7 @@ if __name__ == "__main__":
 	sym_bool = args.symbols
 	salt_value = args.salt
 	length_range = args.length
+	hash_type = args.hash
 
 	start_time = time.time()
 	counts = CreatePool(length_range)
