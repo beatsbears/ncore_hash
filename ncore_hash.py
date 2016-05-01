@@ -2,7 +2,7 @@
 
 '''
 Author: Andrew Scott
-Date: 4/20/2016  ;)
+Date: 4/26/2016 
 '''
 
 
@@ -35,10 +35,13 @@ HASHTYPES = ['MD5','SHA1','SHA224','SHA256','SHA384','SHA512']
 # Parse command line arguments
 ##------------------------------------------------------------------------------------------
 def Arguments():
-	parser = argparse.ArgumentParser(description='Rainbow table creation utility')
+	parser = argparse.ArgumentParser(description='Hash table creation utility')
 
 	parser.add_argument('-d', "--directory",  help="Storage Directory", type= ValidateDirectory, required=True)
 	parser.add_argument('-l', "--length",  help="Length range e.g. 2-8", type= RangeGeneration, required=False)
+	parser.add_argument('-f',"--file", help="Import Dictionary file", type= ValidateFile, required=False)
+	parser.add_argument("-s", "--salt", help="[Optional] Salt Value", type=str)
+	
 	parser.add_argument('--hash', help="Hash function to use {}".format(str(HASHTYPES)), type= GetHashFunction, required=False)
 
 	parser.add_argument("--lowercase", help="Use lowercase character set", action="store_true", default=False)
@@ -46,9 +49,7 @@ def Arguments():
 	parser.add_argument("--num", help="Use numeric character set", action="store_true", default=False)
 	parser.add_argument("--symbols", help="Use symbols", action="store_true", default=False)
 	parser.add_argument("--full_ascii", help="Use full ascii character set", action="store_true", default=False)
-	parser.add_argument("--file", help="Import Dictionary file", type= ValidateFile, required=False)
 
-	parser.add_argument("-s", "--salt", help="[Optional] Salt Value", type=str)
 
 	group = parser.add_mutually_exclusive_group(required=True)
 	group.add_argument("--single",help="Single core operation", action="store_true", default=False)
@@ -58,6 +59,21 @@ def Arguments():
 	gl_args = parser.parse_args()
 
 	return gl_args
+
+# Print a silly header
+##------------------------------------------------------------------------------------------
+def PrintHeader():
+	print """\033[0;34m
+ __    _  _______  _______  ______    _______ 
+|  |  | ||       ||       ||    _ |  |       |
+|   |_| ||       ||   _   ||   | ||  |    ___|
+|       ||       ||  | |  ||   |_||_ |   |___ 
+|  _    ||      _||  |_|  ||    __  ||    ___|
+| | |   ||     |_ |       ||   |  | ||   |___ 
+|_|  |__||_______||_______||___|  |_||_______|  v0.1\n\n\033[0m"""
+
+
+
 
 # Validates that the directory provided exists and is writeable
 ##------------------------------------------------------------------------------------------
@@ -163,7 +179,7 @@ def HashGenSingle(ran):
 	list_to_use = GetCharacterList()
 
 	try:
-		file_name = 'RB_Single_{}.csv'.format(hash_type.name)
+		file_name = 'nC_Single_{}.csv'.format(hash_type.name)
 		with open(output_directory + file_name,'w') as f:
 			time_start = time.time()
 			if password_dict:
@@ -224,7 +240,7 @@ def PasswordGen_1(size):
 	list_to_use = GetCharacterList()
 
 	try:
-		file_name = 'RB_{}_{}.csv'.format(size,hash_type.name)
+		file_name = 'nC_{}_{}.csv'.format(size,hash_type.name)
 		with open(output_directory + file_name,'w') as f:
 			time_start = time.time()
 			for i in range(size, size+1):
@@ -295,7 +311,7 @@ def HashList(alist):
 	cnt = 0
 	print "[+] Starting Process"
 	try:
-		file_name = 'RB_{}_{}.csv'.format(alist[0],hash_type.name)
+		file_name = 'nC_{}_{}.csv'.format(alist[0],hash_type.name)
 		with open(output_directory + file_name,'w') as f:
 			time_start = time.time()
 			for pword in alist:
@@ -345,6 +361,7 @@ def CreatePool_2(ran):
 ##------------------------------------------------------------------------------------------
 ##------------------------------------------------------------------------------------------
 if __name__ == "__main__":
+	PrintHeader()
 	args = Arguments()
 	# parse arguements
 	output_directory = args.directory
