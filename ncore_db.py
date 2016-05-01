@@ -21,7 +21,7 @@ def Arguments():
 	parser.add_argument('-dir', "--directory",  help="Read Directory", type= ValidateDirectory, required=False)
 	parser.add_argument('-db', "--database",  help="DB to search for hash", type= ValidateFile, required=False)
 	parser.add_argument('-i', "--input", help="Hash to search for", type=str, required=False)
-	parser.add_argument('-s', "--strict", help="Only include .csv files of the same hash type", action="store_true", default=False, required=False)
+	# parser.add_argument('-s', "--strict", help="Only include .csv files of the same hash type", action="store_true", default=False, required=False)
 	parser.add_argument('-n', "--new", help="Create a new hash database", action="store_true", default=False, required=False)
 	parser.add_argument('-d', "--existingDatabase", help="Use an existing database", type= ValidateDatabase, required=False)
 
@@ -241,7 +241,7 @@ if __name__ == "__main__":
 	directory = args.directory
 	database = args.database
 	hash_to_find = args.input
-	same_hash = args.strict
+	# same_hash = args.strict
 	new_db = args.new
 	existing_db = args.existingDatabase
 	agg_mode = args.agg
